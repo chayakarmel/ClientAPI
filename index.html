@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Calander</title>
+    <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+    <script src='https://cdn.jsdelivr.net/npm/fullcalendar@6.1.9/index.global.min.js'></script>
+
+</head>
+<style>
+    #addEvent {
+        background-color: pink;
+        color: black
+    }
+
+    #updateEvent {
+        background-color: lightblue;
+        color: black
+    }
+
+    #deleteEvent {
+        background-color: yellow;
+        color: black
+    }
+
+    #listToShow {
+        background-color: rgb(119, 204, 119);
+        color: black
+    }
+
+    #eventsList {
+        display: block;
+    }
+</style>
+
+<body>
+    <h1>Api Requests</h1>
+    <div></div>
+    <input id="text" type="text" placeholder="כותרת " />
+    <input id="date" type="date" placeholder="תאריך " />
+    <!-- <input id="id" type="number" placeholder="מזהה" /> -->
+    <button id="addEvent" onclick="addEvent()">Add Event</button>
+    </div>
+    <button id="listToShow" onclick="showList()">Show List</button>
+    <br />
+    <div id="eventsList"> </div>
+    <br />
+    <button id="updateEvent" onclick="Update()">Update Event</button>
+    <input id=id type="number" placeholder="id"/>
+    <p id="p"> Request Result</p>
+    <div id="request-result"></div>
+    <br />
+    <div id="calendar"></div>
+
+    <script>
+
+        window.onload = function () {
+            getEvents();
+        }
+
+        // let events = [];
+
+        // function create() {
+        //     let str = localStorage.getItem('events');
+        //     let obj = {
+        //         "id": events.length + 1,
+        //         "title": text.value,
+        //         "start": date.value,
+        //         "end": date.value
+        //     };
+        //     events.push(obj);
+        //     localStorage.setItem('events', JSON.stringify(events));
+        // }
+
+
+
+
+        function addEvent() {
+            let text = document.getElementById("text").value;
+            let start = document.getElementById("date").value;
+            let end = document.getElementById("date").value;
+            axios.post("https://localhost:7038/api/Events", {
+                title: text, start: start, end: end,
+            }).then(res => {
+                document.getElementById("request-result").innerHTML += JSON.stringify(res.data);
+                // create();
+                getEvents()
+            });
+            document.getElementById("request-result").innerHTML = "";
+        }
+
+        function showList() {
+
+            let eventListDiv = document.getElementById("eventsList");
+            axios.get("https://localhost:7038/api/Events").then((res) => {
+                let events = res.data;
+
+                let listHTML = "<ul>";
+                events.forEach((event) => {
+                    listHTML += `<li onclick="deleteEvent(${event.id})">${event.id}-${event.title}</li>`;
+                });
+                listHTML += "</ul>";
+
+                eventListDiv.innerHTML = listHTML
+            });
+        }
+
+        function Update() {
+
+            let eventId = document.getElementById("id").value;
+            updateEvent(eventId);
+        }
+
+        function updateEvent(id) {
+            let text = document.getElementById("text").value;
+            let start = document.getElementById("date").value;
+            let end = document.getElementById("date").value;
+            axios.put(`https://localhost:7038/api/Events/${id}`, {
+                title: text, start: start, end: end,
+            })
+                .then((res) => {
+                    document.getElementById("request-result").innerHTML += JSON.stringify(res.data);
+                    // create();
+                    getEvents();
+                    showList();
+                });
+        }
+
+        function deleteEvent(id) {
+            axios.delete(`https://localhost:7038/api/Events/${id}`, {
+            }).then((res) => {
+                // let list=res;
+                // list.remove();
+                // document.getElementById("request-result").innerHTML = `הארוע נמחק בהצלחה`;
+                showList()
+                getEvents();
+            });
+        }
+
+        function getEvents() {
+            axios.get("https://eventsapi.onrender.com/api/Events").then((res) => {
+                var calendarEl = document.getElementById("calendar");
+                var calendar = new FullCalendar.Calendar(calendarEl, {
+                    initialView: "dayGridMonth",
+                    events: res.data,
+                });
+                calendar.render();
+
+
+            });
+
+        }
+
+
+    </script>
+    <!-- <script>
+
+        document.addEventListener('DOMContentLoaded', function () {
+            axios.get("https://eventsapi.onrender.com/api/Events").then((res) => {
+                var calendarEl = document.getElementById('calendar');
+                var calendar = new FullCalendar.Calendar(calendarEl, {
+                    initialView: 'dayGridMonth',
+                    events: res.data,
+                });
+                calendar.render();
+            });
+        });
+    </script> -->
+
+</body>
+
+</html>
