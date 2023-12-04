@@ -5,7 +5,7 @@
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Calander</title>
+    <title>Calander1</title>
     <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
     <script src='https://cdn.jsdelivr.net/npm/fullcalendar@6.1.9/index.global.min.js'></script>
 
@@ -39,13 +39,13 @@
 <body>
     <h1>Api Requests</h1>
     <div></div>
-    <input id="text" type="text" placeholder="כותרת " />
+    <input id="text" type="text" placeholder="תאור הארוע " />
     <input id="date" type="date" placeholder="תאריך " />
     <!-- <input id="id" type="number" placeholder="מזהה" /> -->
     <button id="addEvent" onclick="addEvent()">Add Event</button>
     </div>
     <button id="listToShow" onclick="showList()">Show List</button>
-    <br />
+    <br/>
     <div id="eventsList"> </div>
     <br />
     <button id="updateEvent" onclick="Update()">Update Event</button>
@@ -83,13 +83,14 @@
             let start = document.getElementById("date").value;
             let end = document.getElementById("date").value;
             axios.post("https://localhost:7038/api/Events", {
-                title: text, start: start, end: end,
+                title: text, start: start,end:start,
             }).then(res => {
+                console.log("res",res);
                 document.getElementById("request-result").innerHTML += JSON.stringify(res.data);
                 // create();
                 getEvents()
             });
-            document.getElementById("request-result").innerHTML = "";
+            // document.getElementById("request-result").innerHTML = "";
         }
 
         function showList() {
@@ -119,7 +120,7 @@
             let start = document.getElementById("date").value;
             let end = document.getElementById("date").value;
             axios.put(`https://localhost:7038/api/Events/${id}`, {
-                title: text, start: start, end: end,
+                title: text, start: start, end:start,
             })
                 .then((res) => {
                     document.getElementById("request-result").innerHTML += JSON.stringify(res.data);
@@ -141,7 +142,7 @@
         }
 
         function getEvents() {
-            axios.get("https://eventsapi.onrender.com/api/Events").then((res) => {
+            axios.get("https://localhost:7038/api/Events").then((res) => {
                 var calendarEl = document.getElementById("calendar");
                 var calendar = new FullCalendar.Calendar(calendarEl, {
                     initialView: "dayGridMonth",
